@@ -35,19 +35,16 @@ const parseAmt = (s) => parseInt(s.replace(/[^0-9]/g, ''), 10) || 0;
 
 // ─── Quick Picks ──────────────────────────────────────────────────────────────
 const CORPUS_CHIPS = [
-  { label:'₹50L',   value:5e6  },
   { label:'₹1 Cr',  value:1e7  },
   { label:'₹2 Cr',  value:2e7  },
   { label:'₹5 Cr',  value:5e7  },
-  { label:'₹10 Cr', value:1e8  },
-  { label:'₹20 Cr', value:2e8  },
+  { label:'₹10 Cr', value:1e8  }
 ];
 const SIP_CHIPS = [
-  { label:'₹5,000',    value:5000   },
   { label:'₹10,000',   value:10000  },
   { label:'₹25,000',   value:25000  },
   { label:'₹50,000',   value:50000  },
-  { label:'₹1,00,000', value:100000 },
+  { label:'₹1,00,000', value:750000 },
 ];
 
 // ─── Shared Primitives ────────────────────────────────────────────────────────
@@ -113,12 +110,12 @@ const AgeCarousel = ({ age, onChange }) => {
     container.scrollTo({ left: target, behavior });
   };
 
-  // On mount, jump to initial age instantly
-  useEffect(() => { scrollTo(age, 'instant'); }, []);
+  // On mount, jump to initial age instantly (skip if no age selected yet)
+  useEffect(() => { if (age != null) scrollTo(age, 'instant'); }, []);
 
   // When age changes from outside, scroll to it
   useEffect(() => {
-    if (!isScrolling.current) scrollTo(age);
+    if (age != null && !isScrolling.current) scrollTo(age);
   }, [age]);
 
   const onScroll = () => {
@@ -165,8 +162,8 @@ const AgeCarousel = ({ age, onChange }) => {
         }}
       >
         {AGES.map((a, i) => {
-          const selected = a === age;
-          const dist = Math.abs(a - age);
+          const selected = age != null && a === age;
+          const dist = age != null ? Math.abs(a - age) : -1;
           return (
             <button
               key={a}
@@ -184,7 +181,7 @@ const AgeCarousel = ({ age, onChange }) => {
                 color: selected ? '#fff' : C.text,
                 fontFamily: bvp(), fontSize: 16, fontWeight: 600,
                 cursor: 'pointer',
-                opacity: dist === 0 ? 1 : 0.5,
+                opacity: age == null ? 1 : dist === 0 ? 1 : 0.5,
                 transition: 'opacity 0.15s, background 0.15s, padding 0.15s',
               }}
             >{a}</button>
@@ -259,7 +256,8 @@ export const WizardHeader = ({ onBack }) => (
 export const Step1 = ({ onNext }) => {
   const [selCorpus, setSelCorpus] = useState(null);
   const [custCorpus, setCustCorpus] = useState('');
-  const [age, setAge] = useState(28);
+  const [age, setAge] = useState(null);
+  const [showSheet, setShowSheet] = useState(false);
 
   const corpus = selCorpus ?? parseAmt(custCorpus);
   const valid  = corpus > 0 && age >= 18 && age <= 65;
@@ -276,11 +274,13 @@ export const Step1 = ({ onNext }) => {
         <p style={{ fontFamily:dm(), fontSize:20, color:'#1a1a1a', textAlign:'center', lineHeight:'28px' }}>
           How much money means freedom to you?
         </p>
-        <div style={{ height:28, border:`1px solid ${C.border}`, borderRadius:16,
-          background:'#fff', padding:'0 16px', display:'inline-flex', alignItems:'center' }}>
+        <div onClick={() => setShowSheet(true)} style={{ height:28, border:`1px solid ${C.border}`, borderRadius:16,
+          background:'#fff', padding:'0 16px', display:'inline-flex', alignItems:'center', cursor:'pointer' }}>
           <span style={{ fontFamily:bvp(), fontSize:12, fontWeight:500, color:C.textSec }}>Need help?</span>
         </div>
       </div>
+
+      <CorpusSheet open={showSheet} onClose={() => setShowSheet(false)}/>
 
       {/* Corpus chips */}
       <div style={{ display:'flex', flexWrap:'wrap', gap:8, justifyContent:'center', padding:'24px 0 0' }}>
@@ -321,7 +321,6 @@ export const Step1 = ({ onNext }) => {
 export const Step2 = ({ onNext, onBack }) => {
   const [selSIP, setSelSIP] = useState(null);
   const [custSIP, setCustSIP] = useState('');
-
   const sip   = selSIP ?? parseAmt(custSIP);
   const valid  = sip > 0;
 
@@ -358,6 +357,92 @@ export const Step2 = ({ onNext, onBack }) => {
         </CTAButton>
       </StickyCTA>
     </div>
+  );
+};
+
+// ─── Corpus Bottom Sheet (Step 2 helper) ──────────────────────────────────────
+const CORPUS_HINT_CHIPS = [
+  { label:'₹1 Cr', value:1e7 },
+  { label:'₹2 Cr', value:2e7 },
+  { label:'₹5 Cr', value:5e7 },
+];
+
+const CorpusSheet = ({ open, onClose }) => {
+  const [sel, setSel] = useState(null);
+  const passive = sel ? Math.round((sel * 0.04) / 12) : null;
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div onClick={onClose} style={{
+        position:'fixed', inset:0, zIndex:300,
+        background:'rgba(0,0,0,0.4)',
+        opacity: open ? 1 : 0,
+        pointerEvents: open ? 'auto' : 'none',
+        transition:'opacity 0.28s ease',
+      }}/>
+
+      {/* Sheet */}
+      <div style={{
+        position:'fixed', bottom:0, left:'50%',
+        width:'100%', maxWidth:480, zIndex:301,
+        background:'#fff', borderRadius:'20px 20px 0 0',
+        padding:'12px 20px 36px',
+        boxSizing:'border-box',
+        transition:'transform 0.32s cubic-bezier(0.32,0.72,0,1)',
+        transform: open
+          ? 'translateX(-50%) translateY(0)'
+          : 'translateX(-50%) translateY(100%)',
+      }}>
+        {/* Drag handle */}
+        <div style={{ width:36, height:4, borderRadius:2, background:'#E0E0E0', margin:'0 auto 20px' }}/>
+
+        {/* Header */}
+        <p style={{ fontFamily:dm(), fontSize:22, color:C.text, lineHeight:'28px', marginBottom:10 }}>
+          How much do I need?
+        </p>
+
+        {/* Description */}
+        <p style={{ fontFamily:bvp(), fontSize:14, color:C.textSec, lineHeight:'22px', marginBottom:20 }}>
+          Imagine how much money you need to retire, this money stays invested and you keep withdrawing monthly.
+          <br />
+        </p>
+        <p style={{ fontFamily:bvp(), fontSize:14, fontWeight:600, color:C.textSec, lineHeight:'18px', marginBottom:20}}>For Example: <br /> Select a goal amount: </p>
+
+        {/* Example chips */}
+        <div style={{ display:'flex', gap:10, marginBottom:20 }}>
+          {CORPUS_HINT_CHIPS.map(c => (
+            <button key={c.value} onClick={() => setSel(c.value)} style={{
+              height:40, padding:'0 20px', borderRadius:32,
+              border:`1.5px solid ${sel===c.value ? 'transparent' : C.border}`,
+              background: sel===c.value ? C.primary : '#fff',
+              color: sel===c.value ? '#fff' : C.text,
+              fontFamily:bvp(), fontSize:14, fontWeight:600,
+              cursor:'pointer', transition:'all 0.18s',
+            }}>{c.label}</button>
+          ))}
+        </div>
+
+        {/* Passive income line */}
+        <div style={{
+          background:`linear-gradient(135deg, rgba(26,107,79,0.08), rgba(26,107,79,0.03))`,
+          border:`1px solid rgba(26,107,79,0.18)`,
+          borderRadius:12, padding:'14px 16px', marginBottom:24,
+          opacity: passive ? 1 : 0,
+          transition:'opacity 0.25s ease',
+        }}>
+          <p style={{ fontFamily:bvp(), fontSize:14, color:C.textSec, lineHeight:'20px' }}>
+            With this you can get = {' '}
+            <strong style={{ color:C.primary,fontSize:14, fontWeight: 900, fontVariantNumeric:'tabular-nums' }}>
+              {passive ? fFull(passive) : '—'}/month
+            </strong>{' '} After you retire 😊
+          </p>
+        </div>
+
+        {/* CTA */}
+        <CTAButton onClick={onClose}>Understood</CTAButton>
+      </div>
+    </>
   );
 };
 
@@ -409,7 +494,16 @@ const WhatIfRow3 = ({ label, sip, corpus, currentAge, selected, onClick }) => {
 // ─── Step 3 ───────────────────────────────────────────────────────────────────
 export const Step3 = ({ corpus, currentAge, monthly, onReset }) => {
   const [selectedF, setSelectedF] = useState(1.0);
+  const [phase, setPhase] = useState(0);
   const activeSip = Math.round(monthly * selectedF);
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setPhase(1), 160);   // label zooms in
+    const t2 = setTimeout(() => setPhase(2), 1200);  // age row fades in
+    const t3 = setTimeout(() => setPhase(3), 1800); // "YOU WILL HAVE" + amount
+    const t4 = setTimeout(() => setPhase(4), 2400); // rest slides up
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+  }, []);
 
   const freedomN  = useMemo(() => findFreedomMonths(activeSip, corpus), [activeSip, corpus]);
   const isBeyond  = !isFinite(freedomN);
@@ -423,17 +517,6 @@ export const Step3 = ({ corpus, currentAge, monthly, onReset }) => {
   const totalCorp = isBeyond ? 0 : sipFV(activeSip, freedomN);
   const totalRet  = totalCorp - totalInv;
 
-  const chartData = useMemo(() => {
-    if (isBeyond) return [];
-    const now = new Date();
-    return [1, 2, 3, 4].map(i => {
-      const n = Math.round((freedomN / 4) * i);
-      const d = new Date(now); d.setMonth(d.getMonth() + n);
-      const invested = Math.round(activeSip * n);
-      const returns  = Math.round(sipFV(activeSip, n) - invested);
-      return { year: d.getFullYear(), invested, returns };
-    });
-  }, [activeSip, freedomN, isBeyond]);
 
   if (isBeyond) return (
     <div style={{ paddingBottom: 100 }}>
@@ -459,16 +542,28 @@ export const Step3 = ({ corpus, currentAge, monthly, onReset }) => {
     { label:'+50% (aggressive)',   f:1.50 },
   ];
 
+  const tr = 'opacity 0.45s ease, transform 0.45s ease';
+
   return (
     <div style={{ paddingBottom: 100 }}>
 
-      {/* ── "Your freedom age is" label ── */}
-      <p style={{ fontFamily:dm(), fontSize:20, color:C.textSec, textAlign:'center', lineHeight:'24px', paddingTop:16 }}>
+      {/* ── "Your freedom age is" label — phase 1: zoom in ── */}
+      <p style={{
+        fontFamily:dm(), fontSize:20, color:C.textSec, textAlign:'center', lineHeight:'24px', paddingTop:16,
+        opacity: phase >= 1 ? 1 : 0,
+        transform: phase >= 1 ? 'scale(1)' : 'scale(0.50)',
+        transition: tr,
+      }}>
         Your freedom age is
       </p>
 
-      {/* ── Age + laurels ── */}
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8, paddingTop:32 }}>
+      {/* ── Age + laurels — phase 2: fade + slide up ── */}
+      <div style={{
+        display:'flex', alignItems:'center', justifyContent:'center', gap:8, paddingTop:32,
+        opacity: phase >= 2 ? 1 : 0,
+        transform: phase >= 2 ? 'translateY(0)' : 'translateY(16px)',
+        transition: tr,
+      }}>
         <img src="/assets/grains-left.svg" alt="" style={{ width:56, height:56, objectFit:'contain' }}/>
         <span style={{
           fontFamily:dm(), fontSize:56, lineHeight:'56px',
@@ -478,8 +573,13 @@ export const Step3 = ({ corpus, currentAge, monthly, onReset }) => {
         <img src="/assets/grains-right.svg" alt="" style={{ width:56, height:56, objectFit:'contain' }}/>
       </div>
 
-      {/* ── Years away + date ── */}
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4, paddingTop:24 }}>
+      {/* ── Years away + date — phase 2 ── */}
+      <div style={{
+        display:'flex', alignItems:'center', justifyContent:'center', gap:4, paddingTop:24,
+        opacity: phase >= 2 ? 1 : 0,
+        transform: phase >= 2 ? 'translateY(0)' : 'translateY(12px)',
+        transition: 'opacity 0.45s ease 0.1s, transform 0.45s ease 0.1s',
+      }}>
         <span style={{ fontFamily:bvp(), fontSize:12, fontStyle:'italic', color:C.text }}>{yrsAway} years</span>
         <img src={IMG_STAR_SM} alt="" style={{ width:12, height:12 }}/>
         <span style={{ fontFamily:bvp(), fontSize:12, fontStyle:'italic', color:C.textSec }}>{fDate}</span>
@@ -489,8 +589,13 @@ export const Step3 = ({ corpus, currentAge, monthly, onReset }) => {
         <img src="/assets/wealth-journey-tag.svg" alt="Your Wealth Journey" style={{ display:'block', width:'100%', height:'auto' }}/>
       </div>
 
-      {/* ── "YOUR WEALTH JOURNEY" banner + "YOU WILL HAVE" corpus + date ── */}
-      <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:4, paddingTop:24 }}>
+      {/* ── "YOU WILL HAVE" + corpus — phase 3: zoom in big ── */}
+      <div style={{
+        display:'flex', flexDirection:'column', alignItems:'center', gap:4, paddingTop:24,
+        opacity: phase >= 3 ? 1 : 0,
+        transform: phase >= 3 ? 'scale(1)' : 'scale(0.6)',
+        transition: 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+      }}>
         <span style={{ fontFamily:bvp(), fontSize:10, color:C.textMuted, letterSpacing:'0.08em' }}>
           YOU WILL HAVE
         </span>
@@ -503,6 +608,13 @@ export const Step3 = ({ corpus, currentAge, monthly, onReset }) => {
           by {fDate}
         </span>
       </div>
+
+      {/* ── Rest of content — phase 4: slide up ── */}
+      <div style={{
+        opacity: phase >= 4 ? 1 : 0,
+        transform: phase >= 4 ? 'translateY(0)' : 'translateY(32px)',
+        transition: 'opacity 0.5s ease, transform 0.5s ease',
+      }}>
 
       {/* ── Combined card: distribution + bar chart ── */}
       <div style={{ background:C.bgSurface, border:`1px solid ${C.border}`, borderRadius:16,
@@ -530,39 +642,6 @@ export const Step3 = ({ corpus, currentAge, monthly, onReset }) => {
           </div>
         </div>
 
-        {/* Custom bar chart */}
-        {(() => {
-          const MAX_H = 160;
-          const maxCorpus = Math.max(...chartData.map(d => d.invested + d.returns), 1);
-          return (
-            <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-around',
-              height: MAX_H + 32, padding:'0 16px 0' }}>
-              {chartData.map((d, i) => {
-                const corpus = d.invested + d.returns;
-                const totalH = Math.max(Math.round((corpus / maxCorpus) * MAX_H), 12);
-                const retH   = Math.round((d.returns / corpus) * totalH);
-                const invH   = totalH - retH;
-                return (
-                  <div key={i} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:6 }}>
-                    <div style={{ width:33, height:totalH, borderRadius:'4px 4px 0 0',
-                      overflow:'hidden', position:'relative', flexShrink:0 }}>
-                      {/* Returns — green, top */}
-                      <div style={{ position:'absolute', top:0, left:0, right:0, height:retH,
-                        background:'linear-gradient(to bottom, rgba(26,107,79,0.4), rgba(26,107,79,0.1))' }}>
-                      </div>
-                      {/* Invested — amber, bottom */}
-                      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:invH,
-                        background:'linear-gradient(to bottom, rgba(194,113,46,0.4), rgba(194,113,46,0.1))' }}/>
-                    </div>
-                    <span style={{ fontFamily:bvp(), fontSize:10, color:C.textSec, paddingBottom:12 }}>
-                      {d.year}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })()}
       </div>
 
       {/* ── Diamond divider ── */}
@@ -573,7 +652,12 @@ export const Step3 = ({ corpus, currentAge, monthly, onReset }) => {
       </div>
 
       {/* ── What if section ── */}
-      <div style={{ display:'flex', flexDirection:'column', gap:12, alignItems:'center', paddingTop:24 }}>
+      <div style={{
+        display:'flex', flexDirection:'column', gap:12, alignItems:'center', paddingTop:24,
+        opacity: phase >= 4 ? 1 : 0,
+        transform: phase >= 4 ? 'translateY(0)' : 'translateY(240px)',
+        transition: 'opacity 0.5s ease 0.6s, transform 0.5s ease 0.6s',
+      }}>
         <p style={{ fontFamily:dm(), fontSize:20, color:C.text, textAlign:'center', width:'100%' }}>
           What if you invested more?
         </p>
@@ -601,6 +685,7 @@ export const Step3 = ({ corpus, currentAge, monthly, onReset }) => {
         Projections assume 12% annualized returns compounded monthly. Actual returns may vary.
         Past performance does not guarantee future results. This is not financial advice.
       </p>
+      </div>{/* end phase-4 wrapper */}
     </div>
   );
 };

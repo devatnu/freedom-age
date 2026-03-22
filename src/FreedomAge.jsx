@@ -35,8 +35,36 @@ const PlayBtn = () => (
   <img src={A.playIcon} alt="Play" style={{ width:28, height:28, flexShrink:0 }}/>
 );
 
+// ─── Full-Page Video Player ────────────────────────────────────────────────────
+const VideoPlayer = ({ youtubeId, onClose }) => (
+  <div style={{
+    position:'fixed', inset:0, zIndex:400,
+    background:'#000',
+    display:'flex', flexDirection:'column',
+  }}>
+    {/* Close button */}
+    <div style={{ display:'flex', justifyContent:'flex-end', padding:'48px 16px 12px' }}>
+      <button onClick={onClose} style={{
+        width:36, height:36, borderRadius:'50%',
+        background:'rgba(255,255,255,0.15)', border:'none',
+        color:'#fff', fontSize:20, lineHeight:'36px', textAlign:'center',
+        cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+      }}>✕</button>
+    </div>
+    {/* Video */}
+    <div style={{ flex:1, display:'flex', alignItems:'center' }}>
+      <iframe
+        src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`}
+        allow="autoplay; encrypted-media"
+        allowFullScreen
+        style={{ width:'100%', height:'100%', border:'none', display:'block' }}
+      />
+    </div>
+  </div>
+);
+
 // ─── Video Card ───────────────────────────────────────────────────────────────
-const VideoCard = ({ creator, title, thumbnail }) => (
+const VideoCard = ({ creator, title, thumbnail, youtubeId, onPlay }) => (
   <div style={{ flex:1, borderRadius:16, border:`1px solid ${C.border}`,
     overflow:'hidden', background:'linear-gradient(180deg,rgba(26,107,79,0)0%,rgba(26,107,79,0.2)100%)' }}>
     <div style={{ padding:'12px 12px 10px', display:'flex', flexDirection:'column', gap:8 }}>
@@ -49,7 +77,7 @@ const VideoCard = ({ creator, title, thumbnail }) => (
       </div>
       <PlayBtn />
     </div>
-    <div style={{ aspectRatio:'4/3', overflow:'hidden' }}>
+    <div onClick={onPlay} style={{ aspectRatio:'4/3', overflow:'hidden', cursor:'pointer' }}>
       <img src={thumbnail} alt={title} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
     </div>
   </div>
@@ -120,6 +148,60 @@ const FaqItem = ({ q, a }) => {
 };
 
 
+// ─── Bottom Sheet ─────────────────────────────────────────────────────────────
+const BottomSheet = ({ open, onClose, onCTA }) => (
+  <>
+    {/* Backdrop */}
+    <div onClick={onClose} style={{
+      position:'fixed', inset:0, zIndex:300,
+      background:'rgba(0,0,0,0.4)',
+      opacity: open ? 1 : 0,
+      pointerEvents: open ? 'auto' : 'none',
+      transition:'opacity 0.28s ease',
+    }}/>
+
+    {/* Sheet */}
+    <div style={{
+      position:'fixed', bottom:0, left:'50%', transform:'translateX(-50%)',
+      width:'100%', maxWidth:480, zIndex:301,
+      background:'#fff', borderRadius:'20px 20px 0 0',
+      padding:'12px 20px 36px',
+      boxSizing:'border-box',
+      transition:'transform 0.32s cubic-bezier(0.32,0.72,0,1)',
+      transform: open
+        ? 'translateX(-50%) translateY(0)'
+        : 'translateX(-50%) translateY(100%)',
+    }}>
+      {/* Drag handle */}
+      <div style={{ width:36, height:4, borderRadius:2, background:'#E0E0E0', margin:'0 auto 20px' }}/>
+
+      {/* Header */}
+      <p style={{ fontFamily:"'DM Serif Display',serif", fontSize:22, color:C.text, lineHeight:'28px', marginBottom:12 }}>
+        What is freedom age?
+      </p>
+
+      {/* Description */}
+      <p style={{ fontFamily:bvp(), fontSize:14, color:C.textSec, lineHeight:'22px', marginBottom:20 }}>
+        This is the age when you can live free with a balance in your account.
+      </p>
+
+      {/* Highlight */}
+      <div style={{
+        background:`linear-gradient(135deg, rgba(26,107,79,0.08), rgba(26,107,79,0.03))`,
+        border:`1px solid rgba(26,107,79,0.18)`,
+        borderRadius:12, padding:'14px 16px', marginBottom:28,
+      }}>
+        <p style={{ fontFamily:bvp(), fontSize:13, fontWeight:600, color:C.primary, lineHeight:'20px' }}>
+          We will tell you how much you need to start investing monthly?
+        </p>
+      </div>
+
+      {/* CTA */}
+      <CTAButton onClick={() => { onClose(); onCTA(); }}>Let's plan</CTAButton>
+    </div>
+  </>
+);
+
 // ─── AMC Strip (single combined image, 832×160 = 4 logos) ────────────────────
 const AmcStrip = () => (
   <img src={A.amcIcons} alt="AMC logos" style={{ height:40, width:'auto', objectFit:'contain' }}/>
@@ -133,7 +215,7 @@ const AmcStrip = () => (
 // ─── Header ───────────────────────────────────────────────────────────────────
 
 // ─── Hero Section ─────────────────────────────────────────────────────────────
-const HeroSection = ({ onCalculate }) => (
+const HeroSection = ({ onCalculate, onLearnMore }) => (
   <div style={{ padding:'24px 16px 0' }}>
     {/* Hero label — "YOUR MONEY. YOUR TIMELINE." banner */}
     <img src={A.heroLabel} alt="Your Money. Your Timeline." style={{ width:'100%', display:'block' }}/>
@@ -174,14 +256,16 @@ const HeroSection = ({ onCalculate }) => (
     
     <div style={{ display:'flex', alignItems:'center', gap:8 }}>
       <img src={A.dividerLineLeft} alt="" style={{ flex:1, minWidth:0 }}/>
-      <span style={{
+      <span onClick={onLearnMore} style={{
         fontFamily:"'Bricolage Grotesque',sans-serif", fontWeight:500,
         fontSize:12, lineHeight:'16px', whiteSpace:'nowrap',
         background:G.amber, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
         textDecoration:'underline', textDecorationColor:'#C2712E',
+        cursor:'pointer',
       }}>
         What's freedom age?
       </span>
+
       <img src={A.dividerLineRight} alt="" style={{ flex:1, minWidth:0 }}/>
     </div>
 
@@ -245,21 +329,25 @@ const LearnSection = () => (
 );
 
 // ─── Watch Section ────────────────────────────────────────────────────────────
-const WatchSection = () => (
-  <div style={{ padding:'0 16px 32px' }}>
-    <SectionHead plain="Watch" gradient="Experts Tips"/>
-    <div style={{ display:'flex', flexDirection:'column', gap:14, paddingTop:22 }}>
-      <div style={{ display:'flex', gap:14 }}>
-        <VideoCard creator="Sharan Hegde"  title="4 Ways to Attract Money in Your Life"       thumbnail={A.vid1}/>
-        <VideoCard creator="Ankur Warikoo" title="How Much Money Did I Make This Year?"        thumbnail={A.vid2}/>
-      </div>
-      <div style={{ display:'flex', gap:14 }}>
-        <VideoCard creator="Pranjal Kamra" title="Simple Financial Plan for 20 Years"          thumbnail={A.vid3}/>
-        <VideoCard creator="Rahul Malodia" title="Increase Sales for Your Small Business"      thumbnail={A.vid4}/>
+const WatchSection = () => {
+  const [activeId, setActiveId] = React.useState(null);
+  return (
+    <div style={{ padding:'0 16px 32px' }}>
+      {activeId && <VideoPlayer youtubeId={activeId} onClose={() => setActiveId(null)}/>}
+      <SectionHead plain="Watch" gradient="Experts Tips"/>
+      <div style={{ display:'flex', flexDirection:'column', gap:14, paddingTop:22 }}>
+        <div style={{ display:'flex', gap:14 }}>
+          <VideoCard creator="Sharan Hegde"  title="4 Ways to Attract Money in Your Life"       thumbnail={A.vid1} youtubeId="sTEv9CtQuqg" onPlay={() => setActiveId('sTEv9CtQuqg')}/>
+          <VideoCard creator="Ankur Warikoo" title="How Much Money Did I Make This Year?"        thumbnail={A.vid2} youtubeId="xQBds2HDXPY" onPlay={() => setActiveId('xQBds2HDXPY')}/>
+        </div>
+        <div style={{ display:'flex', gap:14 }}>
+          <VideoCard creator="Pranjal Kamra" title="Simple Financial Plan for 20 Years"          thumbnail={A.vid3} youtubeId="eeS8wdiDUko" onPlay={() => setActiveId('eeS8wdiDUko')}/>
+          <VideoCard creator="Rahul Malodia" title="Increase Sales for Your Small Business"      thumbnail={A.vid4} youtubeId="QmvNGLZaUJI" onPlay={() => setActiveId('QmvNGLZaUJI')}/>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ─── FAQ Section ──────────────────────────────────────────────────────────────
 const FaqSection = () => (
@@ -290,6 +378,7 @@ export default function FreedomAge() {
   const [age,     setAge]     = useState(isPreview ? SEED.age     : 0);
   const [monthly, setMonthly] = useState(isPreview ? SEED.monthly : 0);
   const [animate, setAnimate] = useState(true);
+  const [showSheet, setShowSheet] = useState(false);
   const topRef = useRef(null);
 
   const goTo = (n) => {
@@ -327,7 +416,7 @@ export default function FreedomAge() {
       {step === 0 && (
         <div ref={topRef} style={{ position:'relative', zIndex:1 }}>
           <TopHeader/>
-          <HeroSection onCalculate={() => goTo(1)}/>
+          <HeroSection onCalculate={() => goTo(1)} onLearnMore={() => setShowSheet(true)}/>
           <AmcSection/>
           <LearnSection/>
           <WatchSection/>
@@ -335,6 +424,8 @@ export default function FreedomAge() {
           <Footer/>
         </div>
       )}
+
+      <BottomSheet open={showSheet} onClose={() => setShowSheet(false)} onCTA={() => goTo(1)}/>
 
       {/* ── Wizard ── */}
       {step >= 1 && (
