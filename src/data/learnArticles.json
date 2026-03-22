@@ -1,0 +1,52 @@
+[
+  {
+    "source": "Netguru",
+    "date": "Feb 22",
+    "title": "Mastering AI Personal Finance with Netguru",
+    "excerpt": "Discover how AI personal finance tools can simplify and improve your budgeting, saving more and about that",
+    "link": "https://www.netguru.com/blog/ai-personal-finance",
+    "image": "/assets/learn-netguru.png",
+    "logoInitial": "N",
+    "logoBgColor": "#6C6C6C"
+  },
+  {
+    "source": "Intuit",
+    "date": "Feb 22",
+    "title": "Best Financial Literacy Courses by Intuit",
+    "excerpt": "Want to take more control of your finances but don't know where to start?",
+    "link": "https://www.intuit.com/blog/global-stories/best-financial-literacy-courses/",
+    "image": "/assets/learn-intuit.png",
+    "logoInitial": "I",
+    "logoBgColor": "#256BFF"
+  },
+  {
+    "source": "GoFundMe",
+    "date": "Jan 20",
+    "title": "Emergency financial assistance: your complete guide",
+    "excerpt": "If you've ever found yourself worrying about money, you're not alone. Financial issues can keep many of us up at night.",
+    "link": "https://www.gofundme.com/c/blog/emergency-financial-assistance",
+    "image": "/assets/learn-gofundme-1.png",
+    "logoInitial": "GF",
+    "logoBgColor": "#256B00"
+  },
+  {
+    "source": "Dollar&Sense",
+    "date": "Jan 7",
+    "title": "Complete Guide To Finance Blogs And Websites In Singapore",
+    "excerpt": "If being on top of your financial life is one of your goals for 2026, then it makes sense to be reading Singapore's top finance blogs.",
+    "link": "https://dollarsandsense.sg/completely-new-to-finance-here-are-20-singapore-websites-that-you-should-visit-first/",
+    "image": "/assets/learn-dollarsandsense.png",
+    "logoInitial": "DS",
+    "logoBgColor": "#5C5C5C"
+  },
+  {
+    "source": "GoFundMe",
+    "date": "Nov 19",
+    "title": "25 Essential Resources for Seniors Seeking Financial Help",
+    "excerpt": "80% of households with older adults are struggling financially today or at risk of financial insecurity in the future.",
+    "link": "https://www.gofundme.com/c/blog/financial-help-for-seniors",
+    "image": "/assets/learn-gofundme-2.png",
+    "logoInitial": "GF",
+    "logoBgColor": "#256B00"
+  }
+]

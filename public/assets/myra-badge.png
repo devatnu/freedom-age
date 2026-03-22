@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame 2133937547">
+<path id="Star 5" d="M7 3L7.57322 5.04181C7.76177 5.7134 8.2866 6.23823 8.95819 6.42678L11 7L8.95819 7.57322C8.2866 7.76177 7.76177 8.2866 7.57322 8.95819L7 11L6.42678 8.95819C6.23823 8.2866 5.7134 7.76177 5.04181 7.57322L3 7L5.04181 6.42678C5.7134 6.23823 6.23823 5.7134 6.42678 5.04181L7 3Z" fill="url(#paint0_linear_0_11)"/>
+<path id="Star 6" d="M12 0L12.1348 0.480214C12.3234 1.1518 12.8482 1.67664 13.5198 1.86518L14 2L13.5198 2.13482C12.8482 2.32336 12.3234 2.8482 12.1348 3.51979L12 4L11.8652 3.51979C11.6766 2.8482 11.1518 2.32336 10.4802 2.13482L10 2L10.4802 1.86518C11.1518 1.67664 11.6766 1.1518 11.8652 0.480214L12 0Z" fill="url(#paint1_linear_0_11)"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_11" x1="3" y1="7" x2="11" y2="7" gradientUnits="userSpaceOnUse">
+<stop stop-color="#570967"/>
+<stop offset="1" stop-color="#400099"/>
+</linearGradient>
+<linearGradient id="paint1_linear_0_11" x1="10" y1="2" x2="14" y2="2" gradientUnits="userSpaceOnUse">
+<stop stop-color="#570967"/>
+<stop offset="1" stop-color="#400099"/>
+</linearGradient>
+</defs>
+</svg>
