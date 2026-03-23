@@ -215,68 +215,101 @@ const AmcStrip = () => (
 // ─── Header ───────────────────────────────────────────────────────────────────
 
 // ─── Hero Section ─────────────────────────────────────────────────────────────
-const HeroSection = ({ onCalculate, onLearnMore }) => (
+const HeroSection = ({ onCalculate, onLearnMore }) => {
+  const [phase, setPhase] = React.useState(0);
+  React.useEffect(() => {
+    const t1 = setTimeout(() => setPhase(1), 80);   // hero label
+    const t2 = setTimeout(() => setPhase(2), 500);  // title + graphic
+    const t3 = setTimeout(() => setPhase(3), 950);  // plan card
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, []);
+  const tr = (delay = '0s') => `opacity 0.5s ease ${delay}, transform 0.5s ease ${delay}`;
+
+  return (
   <div style={{ padding:'24px 16px 0' }}>
-    {/* Hero label — "YOUR MONEY. YOUR TIMELINE." banner */}
-    <img src={A.heroLabel} alt="Your Money. Your Timeline." style={{ width:'100%', display:'block' }}/>
-
-    {/* Title */}
-    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:12, paddingTop:32, paddingBottom:0 }}>
-      <img src={A.starMain} alt="" style={{ width:16, height:16, flexShrink:0 }}/>
-      <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
-        <p style={{ fontFamily:"'DM Serif Display',serif", fontSize:20, color:'#1E2029', lineHeight:'24px', textAlign:'center', whiteSpace:'nowrap' }}>
-          {`What's Your`}
-        </p>
-        <p style={{ fontFamily:"'DM Serif Display',serif", fontSize:32, lineHeight:'36px',
-          background:G.green, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', textAlign:'center', whiteSpace:'nowrap' }}>
-          Freedom Age?
-        </p>
-      </div>
-      <img src={A.starMain} alt="" style={{ width:16, height:16, flexShrink:0 }}/>
+    {/* Phase 1 — Hero label */}
+    <div style={{
+      opacity: phase >= 1 ? 1 : 0,
+      transform: phase >= 1 ? 'translateY(0)' : 'translateY(-16px)',
+      transition: tr(),
+    }}>
+      <img src={A.heroLabel} alt="Your Money. Your Timeline." style={{ width:'100%', display:'block' }}/>
     </div>
 
-    {/* Hero illustration — single combined image */}
-    <img src={A.heroGraphic} alt="Freedom Age illustration"
-      style={{ width:'100%', display:'block', maxHeight:220, objectFit:'contain', objectPosition:'center bottom' }}/>
-
-    {/* Plan Card */}
-    <div style={{ background:C.bgSurface, border:`1px solid ${C.border}`, borderRadius:16,
-      boxShadow:'0 4px 24px rgba(0,0,0,0.04)', padding:'16px 16px 28px',
-      display:'flex', flexDirection:'column', gap:20, alignItems:'center' }}>
-
-      {/* Description */}
-      <div style={{ background:`linear-gradient(180deg,${C.bgSection} 0%,#fff 100%)`,
-        borderRadius:12, padding:12, width:'100%' }}>
-        <p style={{ fontFamily:"'Be Vietnam Pro',sans-serif", fontSize:12, color:C.textSec,
-          lineHeight:'20px', textAlign:'center' }}>
-          Everyone wants to retire with some security, but where do you start?
-        </p>
+    {/* Phase 2 — Title + graphic */}
+    <div style={{
+      opacity: phase >= 2 ? 1 : 0,
+      transform: phase >= 2 ? 'translateY(0)' : 'translateY(20px)',
+      transition: tr(),
+    }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:12, paddingTop:32, paddingBottom:0 }}>
+        <img src={A.starMain} alt="" style={{ width:16, height:16, flexShrink:0 }}/>
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center' }}>
+          <p style={{ fontFamily:"'DM Serif Display',serif", fontSize:20, color:'#1E2029', lineHeight:'24px', textAlign:'center', whiteSpace:'nowrap' }}>
+            {`What's Your`}
+          </p>
+          <p style={{ fontFamily:"'DM Serif Display',serif", fontSize:32, lineHeight:'36px',
+            background:G.green, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', textAlign:'center', whiteSpace:'nowrap' }}>
+            Freedom Age?
+          </p>
+        </div>
+        <img src={A.starMain} alt="" style={{ width:16, height:16, flexShrink:0 }}/>
       </div>
-
-    
-    <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-      <img src={A.dividerLineLeft} alt="" style={{ flex:1, minWidth:0 }}/>
-      <span onClick={onLearnMore} style={{
-        fontFamily:"'Bricolage Grotesque',sans-serif", fontWeight:500,
-        fontSize:12, lineHeight:'16px', whiteSpace:'nowrap',
-        background:G.amber, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
-        textDecoration:'underline', textDecorationColor:'#C2712E',
-        cursor:'pointer',
-      }}>
-        What's freedom age?
-      </span>
-
-      <img src={A.dividerLineRight} alt="" style={{ flex:1, minWidth:0 }}/>
+      <img src={A.heroGraphic} alt="Freedom Age illustration"
+        style={{ width:'100%', display:'block', maxHeight:220, objectFit:'contain', objectPosition:'center bottom' }}/>
     </div>
 
-      {/* CTA */}
-      <CTAButton onClick={onCalculate}>Calculate Now</CTAButton>
+    {/* Phase 3 — Plan card */}
+    <div style={{
+      opacity: phase >= 3 ? 1 : 0,
+      transform: phase >= 3 ? 'translateY(0)' : 'translateY(24px)',
+      transition: tr('0.1s'),
+    }}>
+      <div style={{ background:C.bgSurface, border:`1px solid ${C.border}`, borderRadius:16,
+        boxShadow:'0 4px 24px rgba(0,0,0,0.04)', padding:'16px 16px 28px',
+        display:'flex', flexDirection:'column', gap:20, alignItems:'center' }}>
 
-      {/* Trust */}
-      <img src={A.trustVec} alt="" style={{ width:'100%', display:'block' }}/>
+        <div style={{ background:`linear-gradient(180deg,${C.bgSection} 0%,#fff 100%)`,
+          borderRadius:12, padding:12, width:'100%' }}>
+          <p style={{ fontFamily:"'Be Vietnam Pro',sans-serif", fontSize:12, color:C.textSec,
+            lineHeight:'20px', textAlign:'center' }}>
+            Everyone wants to retire with some security, but where do you start?
+          </p>
+        </div>
+
+        <div style={{ display:'flex', alignItems:'center', gap:8, width:'100%' }}>
+          <img src={A.dividerLineLeft} alt="" style={{ flex:1, minWidth:0 }}/>
+          <span onClick={onLearnMore} style={{
+            fontFamily:"'Bricolage Grotesque',sans-serif", fontWeight:500,
+            fontSize:12, lineHeight:'16px', whiteSpace:'nowrap',
+            background:G.amber, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
+            textDecoration:'underline', textDecorationColor:'#C2712E',
+            cursor:'pointer',
+          }}>
+            What's freedom age?
+          </span>
+          <img src={A.dividerLineRight} alt="" style={{ flex:1, minWidth:0 }}/>
+        </div>
+
+        {/* CTA with ripple rings */}
+        <div style={{ position:'relative', width:'100%' }}>
+          {[0, 0.7, 1.4].map(delay => (
+            <div key={delay} style={{
+              position:'absolute', inset:0,
+              borderRadius:12,
+              animation:`rippleOut 4.0s ease-out ${delay}s infinite`,
+              pointerEvents:'none',
+            }}/>
+          ))}
+          <CTAButton onClick={onCalculate}>Calculate Now</CTAButton>
+        </div>
+
+        <img src={A.trustVec} alt="" style={{ width:'100%', display:'block' }}/>
+      </div>
     </div>
   </div>
-);
+  );
+};
 
 // ─── AMC Section ──────────────────────────────────────────────────────────────
 const AmcSection = () => (
@@ -396,6 +429,10 @@ export default function FreedomAge() {
         ::-webkit-scrollbar { display:none; }
         input::-webkit-inner-spin-button, input::-webkit-outer-spin-button { -webkit-appearance:none; }
         input[type=number] { -moz-appearance:textfield; }
+        @keyframes rippleOut {
+          0%   { box-shadow: 0 0 0 0px  rgba(34,137,106,0.2); }
+          100% { box-shadow: 0 0 0 32px rgba(34,137,106,0);   }
+        }
       `}</style>
 
       {/* ── Page background pattern (scrolls with page) ── */}
