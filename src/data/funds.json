@@ -1,0 +1,82 @@
+[
+  {
+    "rank": 1,
+    "name": "Parag Parikh Flexi Cap Fund Direct Growth",
+    "amc": "PPFAS Mutual Fund",
+    "category": "Flexi Cap",
+    "risk": "Very High Risk",
+    "returns": {
+      "1y": 0.9,
+      "3y": 18.0,
+      "5y": 19.9
+    },
+    "minSip": 1000,
+    "rating": 5,
+    "tag": "Editor's Pick",
+    "iconUrl": "https://assets-netstorage.groww.in/mf-assets/logos/ppfas_groww.png"
+  },
+  {
+    "rank": 2,
+    "name": "HDFC Mid Cap Opportunities Fund Direct Growth",
+    "amc": "HDFC Mutual Fund",
+    "category": "Mid Cap",
+    "risk": "Very High Risk",
+    "returns": {
+      "1y": 8.8,
+      "3y": 24.3,
+      "5y": 21.4
+    },
+    "minSip": 100,
+    "rating": 5,
+    "tag": "Consistent",
+    "iconUrl": "https://assets-netstorage.groww.in/mf-assets/logos/hdfc_groww.png"
+  },
+  {
+    "rank": 3,
+    "name": "Quant Small Cap Fund Direct Growth",
+    "amc": "Quant Mutual Fund",
+    "category": "Small Cap",
+    "risk": "Very High Risk",
+    "returns": {
+      "1y": -4.0,
+      "3y": 18.1,
+      "5y": 22.8
+    },
+    "minSip": 1000,
+    "rating": 4,
+    "tag": "Aggressive",
+    "iconUrl": "https://assets-netstorage.groww.in/mf-assets/logos/quant_groww.png"
+  },
+  {
+    "rank": 4,
+    "name": "Nippon India Large Cap Fund Direct Growth",
+    "amc": "Nippon India Mutual Fund",
+    "category": "Large Cap",
+    "risk": "Very High Risk",
+    "returns": {
+      "1y": -0.4,
+      "3y": 16.5,
+      "5y": 16.0
+    },
+    "minSip": 100,
+    "rating": 4,
+    "tag": "Stable",
+    "iconUrl": "https://assets-netstorage.groww.in/mf-assets/logos/nippon_groww.png"
+  },
+  {
+    "rank": 5,
+    "name": "Bandhan Small Cap Fund Direct Growth",
+    "amc": "Bandhan Mutual Fund",
+    "category": "Small Cap",
+    "risk": "Very High Risk",
+    "returns": {
+      "1y": 5.8,
+      "3y": 29.2,
+      "5y": 23.2
+    },
+    "minSip": 100,
+    "rating": 5,
+    "tag": "High Growth",
+    "iconUrl": "https://assets-netstorage.groww.in/mf-assets/logos/bandhan_groww.png"
+  }
+]

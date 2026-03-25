@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { A, C, G } from '../tokens.js';
 import CTAButton from './CTAButton.jsx';
+import funds from '../data/funds.json';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const bvp = () => `'Be Vietnam Pro', sans-serif`;
@@ -446,6 +447,133 @@ const CorpusSheet = ({ open, onClose }) => {
   );
 };
 
+// ─── Top fund by 3Y return ────────────────────────────────────────────────────
+const topFund = [...funds].sort((a, b) => b.returns['3y'] - a.returns['3y'])[0];
+
+// SIP needed to reach `corpus` in `months` at fund's annual return rate
+const calcSIP = (corpus, months, annualReturnPct) => {
+  const r = annualReturnPct / 100 / 12;
+  if (r === 0 || months <= 0) return Math.ceil(corpus / months);
+  return Math.ceil(corpus * r / ((Math.pow(1 + r, months) - 1) * (1 + r)));
+};
+
+// ─── Fund row (used in card + sheet) ─────────────────────────────────────────
+const FundRow = ({ fund }) => (
+  <div style={{ display:'flex', alignItems:'flex-start', gap:8 }}>
+    <img src={fund.iconUrl} alt={fund.amc} style={{ width:24, height:24, borderRadius:4, objectFit:'cover', flexShrink:0 }}/>
+    <span style={{ fontFamily:bvp(), fontSize:12, color:C.textSec, flex:1, lineHeight:'16px' }}>{fund.name}</span>
+    <div style={{ textAlign:'right', flexShrink:0 }}>
+      <div style={{ fontFamily:bvp(), fontSize:12, fontWeight:700, color:C.primary }}>{fund.returns['3y']}%</div>
+      <div style={{ fontFamily:bvp(), fontSize:10, fontStyle:'italic', color:C.textSec }}>3Y CAGR</div>
+    </div>
+  </div>
+);
+
+// ─── Fund Card ────────────────────────────────────────────────────────────────
+const FundCard = ({ fund, corpus, months, onMoreFunds }) => (
+  <>
+    {/* "★ Recommended plan ★" label */}
+    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8, paddingTop:12, paddingBottom:12 }}>
+      <img src="https://www.figma.com/api/mcp/asset/ab679ac5-0cbd-4f22-bb17-8369a589733a" alt="" style={{ width:12, height:12 }}/>
+      <span style={{ fontFamily:bvp(), fontSize:12, fontStyle:'italic', fontWeight:300, color:C.textSec }}>Recommended plan</span>
+      <img src="https://www.figma.com/api/mcp/asset/ab679ac5-0cbd-4f22-bb17-8369a589733a" alt="" style={{ width:12, height:12 }}/>
+    </div>
+
+    {/* Fund details */}
+    <div style={{ background:C.bgSection, borderRadius:12, padding:12, display:'flex', flexDirection:'column', gap:12 }}>
+      <FundRow fund={fund} />
+
+      {/* Returns row */}
+      <div style={{ display:'flex', gap:16 }}>
+        {[['3Y return', `${fund.returns['3y']}%`], ['1Y return', `${fund.returns['1y']}%`], ['Start SIP', `₹${calcSIP(corpus, months, fund.returns['3y']).toLocaleString('en-IN')}`]].map(([label, val]) => (
+          <div key={label} style={{ flex:1, display:'flex', flexDirection:'column', gap:4 }}>
+            <span style={{ fontFamily:bvp(), fontSize:10, color:C.textSec }}>{label}</span>
+            <span style={{ fontFamily:bvp(), fontSize:12, color:C.primary }}>{val}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer: badges + More funds */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', borderTop:`1px solid ${C.border}`, paddingTop:12 }}>
+        <div style={{ display:'flex', gap:6 }}>
+          <span style={{ fontFamily:bvp(), fontSize:10, fontWeight:500, color:C.text,
+            background:'#FFFFFF', border:'1px solid #ECE8CF', borderRadius:4, padding:'4px 8px' }}>{fund.tag}</span>
+          <span style={{ fontFamily:bvp(), fontSize:10, fontWeight:500, color:C.textSec,
+            background:'#fff', borderRadius:4, padding:'4px 8px' }}>{fund.risk}</span>
+          <span style={{ fontFamily:bvp(), fontSize:10, color:C.textSec,
+            background:'#fff', borderRadius:4, padding:'4px 8px', display:'flex', alignItems:'center', gap:3 }}>
+            {fund.rating} ★
+          </span>
+        </div>
+        <button onClick={onMoreFunds} style={{
+          display:'flex', alignItems:'center', gap:4, height:24, padding:'0 8px 0 12px',
+          background:'#fff', border:`1px solid ${C.border}`, borderRadius:16,
+          fontFamily:bvp(), fontSize:10, fontWeight:500, color:C.textSec, cursor:'pointer',
+        }}>
+          More funds <span style={{ fontSize:12 }}>›</span>
+        </button>
+      </div>
+    </div>
+  </>
+);
+
+// ─── Funds Bottom Sheet ───────────────────────────────────────────────────────
+const FundsSheet = ({ open, onClose, corpus, months }) => (
+  <>
+    <div onClick={onClose} style={{
+      position:'fixed', inset:0, zIndex:300,
+      background:'rgba(0,0,0,0.4)',
+      opacity: open ? 1 : 0,
+      pointerEvents: open ? 'auto' : 'none',
+      transition:'opacity 0.28s ease',
+    }}/>
+    <div style={{
+      position:'fixed', bottom:0, left:'50%',
+      width:'100%', maxWidth:480, zIndex:301,
+      background:'#fff', borderRadius:'20px 20px 0 0',
+      padding:'12px 20px 40px',
+      boxSizing:'border-box',
+      maxHeight:'80vh', overflowY:'auto',
+      transition:'transform 0.32s cubic-bezier(0.32,0.72,0,1)',
+      transform: open ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(100%)',
+    }}>
+      <div style={{ width:36, height:4, borderRadius:2, background:'#E0E0E0', margin:'0 auto 20px' }}/>
+      <p style={{ fontFamily:dm(), fontSize:20, color:C.text, marginBottom:4 }}>All Funds</p>
+      <p style={{ fontFamily:bvp(), fontSize:12, color:C.textSec, marginBottom:20 }}>Sorted by best 3Y returns</p>
+
+      <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+        {[...funds].sort((a, b) => b.returns['3y'] - a.returns['3y']).map((fund, i) => (
+          <div key={fund.name} style={{
+            background: i === 0 ? 'rgba(26,107,79,0.04)' : C.bgSection,
+            border: `1px solid ${i === 0 ? C.primary : C.border}`,
+            borderRadius:12, padding:12,
+            display:'flex', flexDirection:'column', gap:10,
+          }}>
+            {i === 0 && (
+              <span style={{ fontFamily:bvp(), fontSize:10, fontWeight:600, color:C.primary, letterSpacing:'0.06em' }}>
+                ★ BEST 3Y RETURN
+              </span>
+            )}
+            <FundRow fund={fund} />
+            <div style={{ display:'flex', gap:12, paddingTop:4, borderTop:`1px solid ${C.border}` }}>
+              {[['1Y', fund.returns['1y']], ['3Y', fund.returns['3y']], ['5Y', fund.returns['5y']]].map(([label, val]) => (
+                <div key={label} style={{ flex:1, textAlign:'center' }}>
+                  <div style={{ fontFamily:bvp(), fontSize:10, color:C.textMuted }}>{label}</div>
+                  <div style={{ fontFamily:bvp(), fontSize:12, fontWeight:700, color: val >= 0 ? C.primary : '#C0392B' }}>{val}%</div>
+                </div>
+              ))}
+              <div style={{ flex:1, textAlign:'center' }}>
+                <div style={{ fontFamily:bvp(), fontSize:10, color:C.textMuted }}>Start SIP</div>
+                <div style={{ fontFamily:bvp(), fontSize:12, color:C.primary }}>₹{calcSIP(corpus, months, fund.returns['3y']).toLocaleString('en-IN')}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </>
+);
+
 // ─── Step 3 assets (decorative, from Figma) ───────────────────────────────────
 const IMG_STAR_SM    = 'https://www.figma.com/api/mcp/asset/f9a3ec5c-5c6b-4122-8d07-ce07e7b97e62';
 const IMG_DIAMOND    = 'https://www.figma.com/api/mcp/asset/e127d1e1-c5d9-4a16-b2c5-57b31d500e41';
@@ -495,6 +623,7 @@ const WhatIfRow3 = ({ label, sip, corpus, currentAge, selected, onClick }) => {
 export const Step3 = ({ corpus, currentAge, monthly, onReset }) => {
   const [selectedF, setSelectedF] = useState(1.0);
   const [phase, setPhase] = useState(0);
+  const [showFunds, setShowFunds] = useState(false);
   const activeSip = Math.round(monthly * selectedF);
 
   useEffect(() => {
@@ -616,12 +745,12 @@ export const Step3 = ({ corpus, currentAge, monthly, onReset }) => {
         transition: 'opacity 0.5s ease, transform 0.5s ease',
       }}>
 
-      {/* ── Combined card: distribution + bar chart ── */}
+      {/* ── Combined card: distribution + recommended fund ── */}
       <div style={{ background:C.bgSurface, border:`1px solid ${C.border}`, borderRadius:16,
-        marginTop:16, overflow:'hidden' }}>
+        marginTop:16, overflow:'hidden', padding:12, display:'flex', flexDirection:'column', gap:0 }}>
 
         {/* Distribution strip */}
-        <div style={{ background:C.bgSection, margin:12, borderRadius:8, padding:'12px 12px 10px' }}>
+        <div style={{ background:C.bgSection, borderRadius:8, padding:'12px 12px 10px' }}>
           <div style={{ display:'flex', justifyContent:'space-between', marginBottom:8 }}>
             <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
               <span style={{ fontFamily:bvp(), fontSize:12, fontStyle:'italic', color:C.textSec }}>Total Invested</span>
@@ -642,6 +771,8 @@ export const Step3 = ({ corpus, currentAge, monthly, onReset }) => {
           </div>
         </div>
 
+        {/* Recommended Fund — inside same card */}
+        <FundCard fund={topFund} corpus={corpus} months={freedomN} onMoreFunds={() => setShowFunds(true)} />
       </div>
 
       {/* ── Diamond divider ── */}
@@ -686,6 +817,7 @@ export const Step3 = ({ corpus, currentAge, monthly, onReset }) => {
         Past performance does not guarantee future results. This is not financial advice.
       </p>
       </div>{/* end phase-4 wrapper */}
+      <FundsSheet open={showFunds} onClose={() => setShowFunds(false)} corpus={corpus} months={freedomN}/>
     </div>
   );
 };
