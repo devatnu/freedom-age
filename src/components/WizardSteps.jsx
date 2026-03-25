@@ -68,7 +68,7 @@ const AmtInput = ({ value, onChange, placeholder }) => (
   <div style={{ position:'relative' }}>
     <span style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)',
       color:C.textSec, fontFamily:bvp(), fontSize:15, pointerEvents:'none' }}>₹</span>
-    <input type="text" value={value} onChange={onChange} placeholder={placeholder} style={{
+    <input type="text" inputMode="numeric" value={value} onChange={onChange} placeholder={placeholder} style={{
       width:'100%', height:48, borderRadius:12,
       border:`1px solid ${value ? C.primary : '#d9d9d9'}`,
       paddingLeft:30, paddingRight:14,
@@ -674,6 +674,7 @@ export const Step3 = ({ corpus, currentAge, monthly, onReset }) => {
   const tr = 'opacity 0.45s ease, transform 0.45s ease';
 
   return (
+    <>
     <div style={{ paddingBottom: 100 }}>
 
       {/* ── "Your freedom age is" label — phase 1: zoom in ── */}
@@ -817,7 +818,9 @@ export const Step3 = ({ corpus, currentAge, monthly, onReset }) => {
         Past performance does not guarantee future results. This is not financial advice.
       </p>
       </div>{/* end phase-4 wrapper */}
-      <FundsSheet open={showFunds} onClose={() => setShowFunds(false)} corpus={corpus} months={freedomN}/>
     </div>
+
+    <FundsSheet open={showFunds} onClose={() => setShowFunds(false)} corpus={corpus} months={freedomN}/>
+    </>
   );
 };
